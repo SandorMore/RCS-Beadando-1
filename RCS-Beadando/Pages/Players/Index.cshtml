@@ -1,0 +1,53 @@
+@page
+@model RCS_Beadando.Pages.Players.IndexModel
+@{
+    ViewData["Title"] = "Players";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Players</h1>
+    <a asp-page="Edit" class="btn btn-primary">+ New player</a>
+</div>
+
+@* method="get" puts the search into the URL (?Search=...), so it can be bookmarked *@
+<form method="get" class="mb-3 d-flex gap-2" style="max-width: 400px">
+    <input asp-for="Search" class="form-control" placeholder="Search by name" />
+    <button class="btn btn-outline-secondary">Search</button>
+</form>
+
+@if (!Model.Players.Any())
+{
+    <p class="text-muted">No players found.</p>
+}
+else
+{
+    <table class="table table-hover align-middle">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Play style</th>
+                <th class="text-end">Hands together</th>
+                <th class="text-end">Your result vs them</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in Model.Players)
+            {
+                <tr>
+                    <td><a asp-page="Details" asp-route-id="@p.Id">@p.Name</a></td>
+                    <td>@p.PlayStyle.DisplayName()</td>
+                    <td class="text-end">@p.Hands.Count</td>
+                    <td class="text-end"><partial name="_Net" model="p.Hands.Sum(h => h.Result)" /></td>
+                    <td class="text-end">
+                        <a asp-page="Edit" asp-route-id="@p.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
+                        <form method="post" asp-page-handler="Delete" asp-route-id="@p.Id" class="d-inline"
+                              onsubmit="return confirm('Delete this player?');">
+                            <button class="btn btn-sm btn-outline-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

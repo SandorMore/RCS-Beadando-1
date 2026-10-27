@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using RCS_Beadando.Data;
+
 namespace RCS_Beadando
 {
     public class Program
@@ -8,6 +11,10 @@ namespace RCS_Beadando
 
             // Add services to the container.
             builder.Services.AddRazorPages();
+
+            // Register PokerContext for dependency injection: any page asking for it in its constructor gets one per request
+            builder.Services.AddDbContext<PokerContext>(options =>
+                options.UseSqlite(builder.Configuration.GetConnectionString("PokerContext")));
 
             var app = builder.Build();
 

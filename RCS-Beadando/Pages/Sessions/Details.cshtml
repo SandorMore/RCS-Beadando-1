@@ -1,0 +1,77 @@
+@page "{id:int}"
+@model RCS_Beadando.Pages.Sessions.DetailsModel
+@{
+    ViewData["Title"] = $"Session {Model.Session.Date}";
+    var s = Model.Session;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>@s.Date <small class="text-muted">@s.Stakes.DisplayName()</small></h1>
+    <div>
+        <a asp-page="Edit" asp-route-id="@s.Id" class="btn btn-outline-secondary">Edit session</a>
+        <a asp-page="/Hands/Edit" asp-route-sessionId="@s.Id" class="btn btn-primary">+ Add hand</a>
+    </div>
+</div>
+
+<div class="row text-center mb-4">
+    <div class="col"><div class="card card-body"><div class="text-muted small">Location</div>@(s.Location ?? "-")</div></div>
+    <div class="col"><div class="card card-body"><div class="text-muted small">Invested</div>@s.BuyInPrice × @s.BuyInNumber = @(s.BuyInPrice * s.BuyInNumber)</div></div>
+    <div class="col"><div class="card card-body"><div class="text-muted small">Cash out</div>@s.CashOut</div></div>
+    <div class="col"><div class="card card-body"><div class="text-muted small">Net</div><strong><partial name="_Net" model="s.Net" /></strong></div></div>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(s.Notes))
+{
+    <p class="fst-italic">@s.Notes</p>
+}
+
+<h3>Hands (@s.Hands.Count)</h3>
+@if (!s.Hands.Any())
+{
+    <p class="text-muted">No hands recorded for this session.</p>
+}
+else
+{
+    <table class="table table-hover align-middle">
+        <thead>
+            <tr>
+                <th>Cards</th>
+                <th>Board</th>
+                <th>Position</th>
+                <th>Opponents</th>
+                <th class="text-end">Bet</th>
+                <th class="text-end">Result</th>
+                <th>Showdown</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var h in s.Hands.OrderBy(h => h.Id))
+            {
+                <tr>
+                    <td><partial name="_Cards" model="h.HoleCardList" /></td>
+                    <td><partial name="_Cards" model="h.BoardList" /></td>
+                    <td>@h.Position.DisplayName()</td>
+                    <td>
+                        @foreach (var p in h.Opponents)
+                        {
+                            <a asp-page="/Players/Details" asp-route-id="@p.Id" class="badge text-bg-light text-decoration-none">@p.Name</a>
+                        }
+                    </td>
+                    <td class="text-end">@h.AmountBet</td>
+                    <td class="text-end"><partial name="_Net" model="h.Result" /></td>
+                    <td>@(h.WentToShowdown ? "Yes" : "")</td>
+                    <td class="text-end text-nowrap">
+                        <a asp-page="/Hands/Edit" asp-route-id="@h.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
+                        <form method="post" asp-page-handler="DeleteHand" asp-route-id="@s.Id" asp-route-handId="@h.Id" class="d-inline"
+                              onsubmit="return confirm('Delete this hand?');">
+                            <button class="btn btn-sm btn-outline-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<a asp-page="Index">← Back to sessions</a>

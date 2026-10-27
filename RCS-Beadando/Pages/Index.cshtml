@@ -1,10 +1,100 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Dashboard</h1>
+    <a asp-page="/Sessions/Edit" class="btn btn-primary">+ New session</a>
+</div>
+
+<div class="row text-center mb-4 g-3">
+    <div class="col-6 col-md"><div class="card card-body"><div class="text-muted small">Sessions</div><span class="fs-4">@Model.TotalSessions</span></div></div>
+    <div class="col-6 col-md"><div class="card card-body"><div class="text-muted small">Winning sessions</div><span class="fs-4">@Model.WinningSessions</span></div></div>
+    <div class="col-6 col-md"><div class="card card-body"><div class="text-muted small">Hands logged</div><span class="fs-4">@Model.TotalHands</span></div></div>
+    <div class="col-6 col-md"><div class="card card-body"><div class="text-muted small">Total invested</div><span class="fs-4">@Model.TotalInvested</span></div></div>
+    <div class="col-12 col-md"><div class="card card-body"><div class="text-muted small">Total net</div><span class="fs-4"><partial name="_Net" model="Model.TotalNet" /></span></div></div>
+</div>
+
+<h3>By position</h3>
+@if (!Model.ByPosition.Any())
+{
+    <p class="text-muted">Log some hands to see position stats.</p>
+}
+else
+{
+    <table class="table table-sm">
+        <thead>
+            <tr><th>Position</th><th class="text-end">Hands</th><th class="text-end">Total bet</th><th class="text-end">Avg bet</th><th class="text-end">Win %</th><th class="text-end">Net</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var p in Model.ByPosition)
+            {
+                <tr>
+                    <td>@p.Position.DisplayName()</td>
+                    <td class="text-end">@p.Hands</td>
+                    <td class="text-end">@p.TotalBet</td>
+                    <td class="text-end">@p.AvgBet.ToString("0")</td>
+                    <td class="text-end">@p.WinRate.ToString("0")%</td>
+                    <td class="text-end"><partial name="_Net" model="p.Net" /></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <h3>By stakes</h3>
+        @if (!Model.ByStakes.Any())
+        {
+            <p class="text-muted">No sessions yet.</p>
+        }
+        else
+        {
+            <table class="table table-sm">
+                <thead>
+                    <tr><th>Stakes</th><th class="text-end">Sessions</th><th class="text-end">Invested</th><th class="text-end">Cashed out</th><th class="text-end">Net</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var s in Model.ByStakes)
+                    {
+                        <tr>
+                            <td>@s.Stakes.DisplayName()</td>
+                            <td class="text-end">@s.Sessions</td>
+                            <td class="text-end">@s.Invested</td>
+                            <td class="text-end">@s.CashOut</td>
+                            <td class="text-end"><partial name="_Net" model="s.Net" /></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+    <div class="col-md-6">
+        <h3>By opponent</h3>
+        @if (!Model.ByOpponent.Any())
+        {
+            <p class="text-muted">Tag opponents on your hands to see this.</p>
+        }
+        else
+        {
+            <table class="table table-sm">
+                <thead>
+                    <tr><th>Player</th><th class="text-end">Hands</th><th class="text-end">Your net</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var o in Model.ByOpponent)
+                    {
+                        <tr>
+                            <td><a asp-page="/Players/Details" asp-route-id="@o.Id">@o.Name</a></td>
+                            <td class="text-end">@o.Hands</td>
+                            <td class="text-end"><partial name="_Net" model="o.Net" /></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
 </div>

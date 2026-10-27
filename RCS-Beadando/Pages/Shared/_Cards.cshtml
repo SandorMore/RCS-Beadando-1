@@ -1,0 +1,6 @@
+@* Partial view: renders a list of cards as little suit-coloured boxes. Use: <partial name="_Cards" model="hand.HoleCardList" /> *@
+@model List<Card>
+@foreach (var card in Model)
+{
+    <span class="playing-card @(card.IsRed ? "red" : "")">@card.Symbol</span>
+}

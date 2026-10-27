@@ -1,0 +1,64 @@
+@page "{id:int?}"
+@model RCS_Beadando.Pages.Sessions.EditModel
+@{
+    ViewData["Title"] = Model.IsNew ? "New session" : "Edit session";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <form method="post">
+            @* Shows every validation error in one list at the top *@
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            @* Hidden field: carries the Id so OnPost knows whether it's an edit *@
+            <input type="hidden" asp-for="Session.Id" />
+
+            <div class="mb-3">
+                <label asp-for="Session.Date" class="form-label"></label>
+                <input asp-for="Session.Date" class="form-control" />
+                <span asp-validation-for="Session.Date" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Session.Stakes" class="form-label"></label>
+                @* GetEnumSelectList builds <option>s from the enum, using the [Display] names *@
+                <select asp-for="Session.Stakes" asp-items="Html.GetEnumSelectList<Enums.Stakes>()" class="form-select"></select>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Session.Location" class="form-label"></label>
+                <input asp-for="Session.Location" class="form-control" placeholder="e.g. Las Vegas Casino, home game" />
+                <span asp-validation-for="Session.Location" class="text-danger"></span>
+            </div>
+            <div class="row">
+                <div class="col mb-3">
+                    <label asp-for="Session.BuyInPrice" class="form-label"></label>
+                    <input asp-for="Session.BuyInPrice" class="form-control" />
+                    <span asp-validation-for="Session.BuyInPrice" class="text-danger"></span>
+                </div>
+                <div class="col mb-3">
+                    <label asp-for="Session.BuyInNumber" class="form-label"></label>
+                    <input asp-for="Session.BuyInNumber" class="form-control" />
+                    <span asp-validation-for="Session.BuyInNumber" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Session.CashOut" class="form-label"></label>
+                <input asp-for="Session.CashOut" class="form-control" />
+                <span asp-validation-for="Session.CashOut" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Session.Notes" class="form-label"></label>
+                <textarea asp-for="Session.Notes" class="form-control" rows="3"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a asp-page="Index" class="btn btn-link">Cancel</a>
+        </form>
+    </div>
+</div>
+
+@* Adds jQuery validation so errors show before the form is even submitted *@
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

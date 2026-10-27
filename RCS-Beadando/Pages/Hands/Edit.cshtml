@@ -1,0 +1,80 @@
+@page "{id:int?}"
+@model RCS_Beadando.Pages.Hands.EditModel
+@{
+    ViewData["Title"] = Model.IsNew ? "New hand" : "Edit hand";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Hand.Id" />
+            <input type="hidden" asp-for="Hand.SessionId" />
+
+            <div class="row">
+                <div class="col mb-3">
+                    <label asp-for="Hand.HoleCards" class="form-label"></label>
+                    <input asp-for="Hand.HoleCards" class="form-control" placeholder="AsKd" />
+                    <span asp-validation-for="Hand.HoleCards" class="text-danger"></span>
+                </div>
+                <div class="col mb-3">
+                    <label asp-for="Hand.Board" class="form-label"></label>
+                    <input asp-for="Hand.Board" class="form-control" placeholder="Qh7c2d (optional)" />
+                    <span asp-validation-for="Hand.Board" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-text mb-3">Ranks: 2-9, T, J, Q, K, A &middot; Suits: s ♠, c ♣, d ♦, h ♥</div>
+
+            <div class="mb-3">
+                <label asp-for="Hand.Position" class="form-label"></label>
+                <select asp-for="Hand.Position" asp-items="Html.GetEnumSelectList<Enums.Position>()" class="form-select"></select>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="SelectedPlayerIds" class="form-label">Opponents</label>
+                @if (Model.PlayerOptions.Any())
+                {
+                    @* asp-for on a List<int> renders <select multiple> automatically *@
+                    <select asp-for="SelectedPlayerIds" asp-items="Model.PlayerOptions" class="form-select" size="5"></select>
+                    <div class="form-text">Ctrl+click to select several.</div>
+                }
+                else
+                {
+                    <div class="text-muted">No players yet. <a asp-page="/Players/Edit">Add one</a>.</div>
+                }
+            </div>
+
+            <div class="row">
+                <div class="col mb-3">
+                    <label asp-for="Hand.AmountBet" class="form-label"></label>
+                    <input asp-for="Hand.AmountBet" class="form-control" />
+                    <span asp-validation-for="Hand.AmountBet" class="text-danger"></span>
+                </div>
+                <div class="col mb-3">
+                    <label asp-for="Hand.Result" class="form-label">Result (+ won / − lost)</label>
+                    <input asp-for="Hand.Result" class="form-control" />
+                    <span asp-validation-for="Hand.Result" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-check mb-3">
+                <input asp-for="Hand.WentToShowdown" class="form-check-input" />
+                <label asp-for="Hand.WentToShowdown" class="form-check-label"></label>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Hand.Notes" class="form-label"></label>
+                <textarea asp-for="Hand.Notes" class="form-control" rows="3"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a asp-page="/Sessions/Details" asp-route-id="@Model.Hand.SessionId" class="btn btn-link">Cancel</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,3 @@
+@* Partial view: a number coloured green when positive, red when negative *@
+@model int
+<span class="@(Model > 0 ? "text-success" : Model < 0 ? "text-danger" : "")">@(Model > 0 ? "+" : "")@Model</span>

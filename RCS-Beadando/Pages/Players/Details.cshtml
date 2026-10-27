@@ -1,0 +1,48 @@
+@page "{id:int}"
+@model RCS_Beadando.Pages.Players.DetailsModel
+@{
+    var p = Model.Player;
+    ViewData["Title"] = p.Name;
+    var hands = p.Hands.OrderByDescending(h => h.Session!.Date).ToList();
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>@p.Name <small class="text-muted">@p.PlayStyle.DisplayName()</small></h1>
+    <a asp-page="Edit" asp-route-id="@p.Id" class="btn btn-outline-secondary">Edit</a>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(p.Notes))
+{
+    <p class="fst-italic">@p.Notes</p>
+}
+
+<div class="row text-center mb-4">
+    <div class="col"><div class="card card-body"><div class="text-muted small">Hands together</div>@hands.Count</div></div>
+    <div class="col"><div class="card card-body"><div class="text-muted small">Won</div>@hands.Count(h => h.Result > 0)</div></div>
+    <div class="col"><div class="card card-body"><div class="text-muted small">Lost</div>@hands.Count(h => h.Result < 0)</div></div>
+    <div class="col"><div class="card card-body"><div class="text-muted small">Your net vs them</div><strong><partial name="_Net" model="hands.Sum(h => h.Result)" /></strong></div></div>
+</div>
+
+@if (hands.Any())
+{
+    <table class="table table-hover align-middle">
+        <thead>
+            <tr><th>Session</th><th>Cards</th><th>Board</th><th>Position</th><th class="text-end">Bet</th><th class="text-end">Result</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var h in hands)
+            {
+                <tr>
+                    <td><a asp-page="/Sessions/Details" asp-route-id="@h.SessionId">@h.Session!.Date</a></td>
+                    <td><partial name="_Cards" model="h.HoleCardList" /></td>
+                    <td><partial name="_Cards" model="h.BoardList" /></td>
+                    <td>@h.Position.DisplayName()</td>
+                    <td class="text-end">@h.AmountBet</td>
+                    <td class="text-end"><partial name="_Net" model="h.Result" /></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<a asp-page="Index">← Back to players</a>
